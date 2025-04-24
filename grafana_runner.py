@@ -2,6 +2,7 @@ import requests
 
 robot_name = "arri-122"
 
+
 class GrafanaRunner:
     def __init__(self):
         self.robot_name = robot_name
@@ -13,16 +14,17 @@ class GrafanaRunner:
     #     print(self.grafana_url)
 
     def export_dashboard_as_pdf(self):
-        headers = {
-            "Authorization": f"Bearer {self.api_key}"
-        }
+        headers = {"Authorization": f"Bearer {self.api_key}"}
         response = requests.get(self.grafana_pdf_url, headers=headers)
         if response.status_code == 200:
             with open(f"{self.robot_name}_last_mission.pdf", "wb") as f:
                 f.write(response.content)
             print(f"Dashboard exported as '{self.robot_name}_last_mission.pdf'")
         else:
-            print(f"Failed to export dashboard as PDF: {response.status_code} - {response.text}")
+            print(
+                f"Failed to export dashboard as PDF: {response.status_code} - {response.text}"
+            )
+
 
 gr = GrafanaRunner()
 gr.export_dashboard_as_pdf()

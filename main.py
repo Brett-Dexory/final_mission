@@ -1,14 +1,14 @@
-import requests, sys, subprocess
+import requests
+import sys
 import argparse
 import questionary
-import os
-import json
 from pathlib import Path
 import time
 
 # robot_name = "arri-115"
 
-class MissionHandler():
+
+class MissionHandler:
     def __init__(self, robot_name, aisle):
         self.robot_name = robot_name
         self.aisle = aisle
@@ -19,14 +19,13 @@ class MissionHandler():
         self.autonomous_endpoint = f"{self.base_url}/config/autonomous-mode"
         self.deployments_endpoint = f"{self.base_url}/deployments"
 
-
         self.mission_names = []
         self.mission_ids = []
-        
+
         self.mission_list = requests.get(self.mission_endpoint)
 
     def get_mission_dict(self):
-        self.json_response = self.mission_list.json()["items"]        
+        self.json_response = self.mission_list.json()["items"]
         for mission in self.json_response:
             self.mission_names.append(mission["spec"]["name"])
             self.mission_ids.append(mission["metadata"]["uuid"])
@@ -39,14 +38,13 @@ class MissionHandler():
             if self.aisle in name
         }
 
-        # print(self.mission_dict)
         return self.mission_dict
 
     def query_user(self):
         self.mission_select = questionary.select(
             "Select a mission to queue",
             choices=self.get_mission_dict(),
-            qmark = ">>",
+            qmark=">>",
         ).ask()
 
         self.disable_autonomous()
@@ -67,33 +65,33 @@ class MissionHandler():
             return response.json()
         else:
             return None
+
     def queue_mission(self):
         self.key = self.mission_select
 
-        print(self.mission_dict.get(self.key))
-        self.queue_payload = {
-            "mission_id": self.mission_dict.get(self.key)
-        }
-        self.queue_response = requests.post(self.deployments_endpoint, json=self.queue_payload)
-        
+        self.queue_payload = {"mission_id": self.mission_dict.get(self.key)}
+        self.queue_response = requests.post(
+            self.deployments_endpoint, json=self.queue_payload
+        )
+
         self.monitor_mission()
 
         return self.queue_response
-    
+
     def monitor_mission(self):
         print("Waiting for mission to complete...")
         deployment_id = None  # Initialize deployment_id
         while True:
-            response = requests.get(
-                f"{self.base_url}/deployments"
-            )
-            # print(response.json()["items"][0])
+            response = requests.get(f"{self.base_url}/deployments")
             if response.status_code == 200:
                 current_deployment = response.json()["items"][0]
 
-                deployment_id = current_deployment.get("metadata")["uuid"] # Extract the "ID"
+                deployment_id = current_deployment.get("metadata")["uuid"]
                 if deployment_id is None:
-                    print("Deployment ID not found in the response. Please check the mission status API.")
+                    print(
+                        "Deployment ID not found in the response. "
+                        "Please check the mission status API."
+                    )
                 else:
                     print(f"Current mission ID: {deployment_id}")
 
@@ -111,8 +109,10 @@ class MissionHandler():
         image_handler = ImageHandler(self, deployment_id)
         image_handler.download_mission_data()
 
-class ImageHandler():
+
+class ImageHandler:
     """Class to handle mission images"""
+
     def __init__(self):
         self.robot_name = "arri-115"
         self.deployment_id = "2d684e3b-6d03-45c2-bfed-93983ead05f0"
@@ -120,68 +120,50 @@ class ImageHandler():
 
         self.base_url = f"http://{self.robot_name}.velociraptor-tuna.ts.net/api/v1"
         # self.deployment_id = deployment_id
-        print(f"Current dpeloyment: {self.deployment_id}")
+
         if self.deployment_id:
             self.deployment_path = f"{self.base_url}/deployments/{self.deployment_id}"
-            print(self.deployment_path)
         else:
-            raise ValueError("Deployment ID is None. Ensure the mission was queued successfully.")
+            raise ValueError(
+                "Deployment ID is None. Ensure the mission was queued successfully."
+            )
 
-        self.ENDPOINTS = [
-            f"{self.deployment_path}/image",
-            f"{self.deployment_path}/locations",
-            f"{self.deployment_path}/markers",
-            f"{self.deployment_path}/location-images",
-        ]
+        self.locations_endpoint = f"{self.deployment_path}/locations"  # returns str
+        self.markers_endpoint = f"{self.deployment_path}/markers"  # returns str
+        self.point_cloud_endpoints = f"{self.deployment_path}/pcd"  # returns x-pcd
+        self.voxels_endpoints = f"{self.deployment_path}/voxels"  # returns str
+        self.image_endpoint = f"{self.deployment_path}/image"  # returns jpg
+        self.location_images_endpoint = (
+            f"{self.deployment_path}/location_images"  # returns zip
+        )
 
-        self.image_endpoint = f"{self.deployment_path}/image" #returns jpg
-        self.locations_endpoint = f"{self.deployment_path}/locations" #returns str
-        self.markers_endpoint = f"{self.deployment_path}/markers" #returns str
-        self.location_images_endpoint = f"{self.deployment_path}/location-images"
-
-
-        print(self.image_endpoint)
     def get_image_folder(self, path=None):
         if path is None:
-            destination_path = Path(f"{self.robot_name}-final-mission-{self.deployment_id}")
-            print(destination_path)
+            destination_path = Path(
+                f"{self.robot_name}-final-mission-{self.deployment_id}"
+            )
         else:
             destination_path = Path(path)
 
         destination_path.mkdir(parents=True, exist_ok=True)
         return destination_path
-    
-    def download_deployment_image(self):
+
+    def download_deployment_image(self, destination_path):
         response = requests.get(self.image_endpoint)
         if response.status_code == 200:
-            with open("image.jpg", 'wb') as f:
+            # destination_path = self.get_image_folder()
+            image_path = destination_path / f"{self.robot_name}-deployment-image.jpg"
+            with open(image_path, "wb") as f:
                 f.write(response.content)
-        
-    def download_mission_data(self):
-        pass
-        # for endpoint in self.ENDPOINTS:
-        #     response = requests.get(endpoint)
-        #     if response.status_code == 200:
-        #         data = response.json()
-        #         filename = os.path.join(self.get_image_folder(), f"{endpoint.split('/')[-1]}.json")
-        #         with open(filename, 'w') as f:
-        #             json.dump(data, f)
-        #         print(f"Data saved to {filename}")
-        #     else:
-        #         print(f"Failed to download data from {endpoint}: {response.status_code}")
+            # print(f"Image saved to {image_path}")
 
-    def save_to_folder(folder_path):
-        # Ensure the folder exists
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-
-        # Define the source file and destination
-        source_file = __file__
-        destination_file = os.path.join(folder_path, os.path.basename(source_file))
-
-        # Copy the file to the folder
-        
-        print(f"File saved to {destination_file}")
+    def download_zip_file(self, destination_path):
+        response = requests.get(self.location_images_endpoint)
+        if response.status_code == 200:
+            image_path = destination_path / f"{self.robot_name}-location-images.zip"
+            with open(image_path, "wb") as f:
+                f.write(response.content)
+            # print(f"Image saved to {image_path}")
 
 
 # LOOK AT DISABLING AUT0-UPLOAD
@@ -195,7 +177,7 @@ class ImageHandler():
 #             "/roboteq_diff_driver/left_motor_amps",
 #             "/roboteq_diff_driver/right_motor_amps"
 #         ]
-        
+
 #         self.bag_path = f"/root/bags/{self.robot_name}-final_mission"
 
 #     def record_rosbag(self, robot_name):
@@ -214,10 +196,7 @@ class ImageHandler():
 #         )
 #         print(proc)
 #         return proc
-    
 
-class Plotjuggler():
-    """Class to open and manipulate Plotjuggler"""
 
 def parse_args():
     """Parse arguments"""
@@ -229,24 +208,33 @@ def parse_args():
     parser.add_argument("aisle", nargs="?", help="aisle name/number")
     return parser.parse_args()
 
+
 def main():
     args = parse_args()
     # mission_Handler = MissionHandler(args.robot_name, args.aisle)
     # bag_recorder = RecordBag(args.robot_name)
     try:
         ir = ImageHandler()
-        ir.download_mission_data()
+
+        destination_path = ir.get_image_folder()
+        ir.download_zip_file(destination_path)
+        ir.download_deployment_image(destination_path)
+
+        ir.get_image_folder()
+
         # bag_recorder.record_rosbag(args.robot_name)
+
         # mission_Handler.query_user()
     except KeyboardInterrupt:
         questionary.print(" - Interrupted by user!", style="bold fg:ansired")
         sys.exit()
-    # except requests.exceptions.RequestException as e:
-    #     questionary.print(f" - Error: {e}", style="bold fg:ansired")
-    #     sys.exit()
-    # except Exception as e:
-    #     questionary.print(f" - Unexpected error: {e}", style="bold fg:ansired")
-    #     sys.exit()
+    except requests.exceptions.RequestException as e:
+        questionary.print(f" - Error: {e}", style="bold fg:ansired")
+        sys.exit()
+    except Exception as e:
+        questionary.print(f" - Unexpected error: {e}", style="bold fg:ansired")
+        sys.exit()
+
 
 if __name__ == "__main__":
     main()
