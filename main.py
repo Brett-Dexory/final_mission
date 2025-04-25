@@ -18,6 +18,7 @@ MAGENTA = "\033[0;35m"
 CYAN = "\033[0;36m"
 NC = "\033[0m"  # No Color
 
+
 class MissionHandler:
     def __init__(self, robot_name, aisle):
         self.robot_name = robot_name
@@ -55,7 +56,6 @@ class MissionHandler:
             "Select a mission to queue",
             choices=self.get_mission_dict(),
             qmark=">>",
-            
         ).ask()
 
         self.disable_autonomous()
@@ -110,7 +110,9 @@ class MissionHandler:
                     print(f"{YELLOW}Mission completed!{NC}")
                     break
             else:
-                print(f"{RED}Failed to fetch mission status: {response.status_code}{NC}")
+                print(
+                    f"{RED}Failed to fetch mission status: {response.status_code}{NC}"
+                )
             time.sleep(5)
 
         self.download_images(deployment_id)
@@ -127,7 +129,7 @@ class ImageHandler:
     def __init__(self):
         self.robot_name = "arri-115"
         self.deployment_id = "2d684e3b-6d03-45c2-bfed-93983ead05f0"
-        
+
         # self.robot_name = mission_handler.robot_name
 
         self.base_url = f"http://{self.robot_name}.velociraptor-tuna.ts.net/api/v1"
@@ -148,7 +150,7 @@ class ImageHandler:
         self.location_images_endpoint = (
             f"{self.deployment_path}/location_images"  # returns zip
         )
-    
+
     def get_image_folder(self, path=None):
         if path is None:
             destination_path = Path(
@@ -159,20 +161,56 @@ class ImageHandler:
 
         destination_path.mkdir(parents=True, exist_ok=True)
         return destination_path
-    
+
     def get_mission_pcd(self, destination_path):
         response = requests.get(self.point_cloud_endpoints)
-        if response.status_code == 200: 
-            image_path = destination_path / f"{self.robot_name}-deployment-pcd.x-pcd"
+        if response.status_code == 200:
+            pcd_image_path = destination_path / f"{self.robot_name}-deployment-pcd.txt"
+            with open(pcd_image_path, "wb") as f:
+                f.write(response.content)
+
+        return pcd_image_path
+        # return pcd_image_path
+
+    def convert_pcd_to_jpg(self, decompressed_path):
+        pcd_image_path = self.get_mission_pcd(decompressed_path)
+        data = np.load(pcd_image_path)
+
+        # coordinates
+        xs = data["x"]
+        ys = data["y"]
+        zs = data["z"]
+        # attribute
+        t_low = data["t_low"]
+
+        fig = plt.figure(figsize=(12, 7))
+        ax = fig.add_subplot(projection="3d")
+        img = ax.scatter(xs, ys, zs, c=t_low, cmap=plt.hot())
+        fig.colorbar(img)
+
+        ax.set_xlabel("X")
+        ax.set_ylabel("Y")
+        ax.set_zlabel("Z")
+
+        plt.show()
+
+    def download_mission_jsons(self, destination_path):
+        response = requests.get(self.locations_endpoint)
+        if response.status_code == 200:
+            image_path = destination_path / f"{self.robot_name}-locations.json"
+            with open(image_path, "wb") as f:
+                f.write(response.content)
+        response = requests.get(self.markers_endpoint)
+        if response.status_code == 200:
+            image_path = destination_path / f"{self.robot_name}-markers.json"
+            with open(image_path, "wb") as f:
+                f.write(response.content)
+        response = requests.get(self.voxels_endpoints)
+        if response.status_code == 200:
+            image_path = destination_path / f"{self.robot_name}-voxels.json"
             with open(image_path, "wb") as f:
                 f.write(response.content)
         return image_path
-    
-
-
-    def download_mission_jsons(self, destination_path):
-        response = requests.get(self.image_endpoint)
-        pass
 
     def download_deployment_image(self, destination_path):
         response = requests.get(self.image_endpoint)
@@ -189,15 +227,15 @@ class ImageHandler:
             with open(image_path, "wb") as f:
                 f.write(response.content)
         return image_path
-
-
     
+    
+
     def download_file_decorator(self, destination_path, image_path):
-        print(f"{YELLOW}Downloading files{NC}")
+        print(f"{YELLOW}Downloading files...{NC}")
         self.download_deployment_image(destination_path)
         self.download_zip_file(destination_path)
+        self.download_mission_jsons(destination_path)
         print(f"{YELLOW}Files downloaded to {image_path}{NC}")
-        
 
 
 # LOOK AT DISABLING AUT0-UPLOAD
@@ -252,10 +290,8 @@ def main():
 
         destination_path = ir.get_image_folder()
         image_path = destination_path / f"{ir.robot_name}-location-images.zip"
-        
-        ir.get_mission_pcd(destination_path)
-        
-        # ir.download_file_decorator(destination_path, image_path)
+
+        ir.download_file_decorator(destination_path, image_path)
 
         # bag_recorder.record_rosbag(args.robot_name)
 
@@ -263,12 +299,12 @@ def main():
     except KeyboardInterrupt:
         questionary.print(" - Interrupted by user!", style="bold fg:ansired")
         sys.exit()
-    except requests.exceptions.RequestException as e:
-        questionary.print(f" - Error: {e}", style="bold fg:ansired")
-        sys.exit()
-    except Exception as e:
-        questionary.print(f" - Unexpected error: {e}", style="bold fg:ansired")
-        sys.exit()
+    # except requests.exceptions.RequestException as e:
+    #     questionary.print(f" - Error: {e}", style="bold fg:ansired")
+    #     sys.exit()
+    # except Exception as e:
+    #     questionary.print(f" - Unexpected error: {e}", style="bold fg:ansired")
+    #     sys.exit()
 
 
 if __name__ == "__main__":
