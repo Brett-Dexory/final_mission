@@ -123,6 +123,38 @@ class MissionHandler:
         image_handler.download_mission_data()
 
 
+# LOOK AT DISABLING AUT0-UPLOAD
+
+# class RecordBag():
+#     def __init__(self, robot_name):
+#         self.robot_name = robot_name
+#         self.rosbags_list = [
+#             "/tf",
+#             "/tf_static",
+#             "/roboteq_diff_driver/left_motor_amps",
+#             "/roboteq_diff_driver/right_motor_amps"
+#         ]
+
+#         self.bag_path = f"/root/bags/{self.robot_name}-final_mission"
+
+#     def record_rosbag(self, robot_name):
+#         self.rosbags = (" ").join(self.rosbags_list)
+#         print(self.rosbags)
+#         proc = subprocess.run(
+#         [
+#             "ssh",
+#             "-t",
+#             f"root@{robot_name}.velociraptor-tuna.ts.net",
+#             "balena exec -it $(balena ps -q -f name=ros) bash -ic",
+#             f"'tmux new-session \'ros2 bag record {self.rosbags} -o {self.bag_path}\''",
+#         ],
+#         capture_output=True,
+#         text=True,
+#         )
+#         print(proc)
+#         return proc
+
+
 class ImageHandler:
     """Class to handle mission images"""
 
@@ -200,11 +232,13 @@ class ImageHandler:
             image_path = destination_path / f"{self.robot_name}-locations.json"
             with open(image_path, "wb") as f:
                 f.write(response.content)
+
         response = requests.get(self.markers_endpoint)
         if response.status_code == 200:
             image_path = destination_path / f"{self.robot_name}-markers.json"
             with open(image_path, "wb") as f:
                 f.write(response.content)
+
         response = requests.get(self.voxels_endpoints)
         if response.status_code == 200:
             image_path = destination_path / f"{self.robot_name}-voxels.json"
@@ -227,8 +261,6 @@ class ImageHandler:
             with open(image_path, "wb") as f:
                 f.write(response.content)
         return image_path
-    
-    
 
     def download_file_decorator(self, destination_path, image_path):
         print(f"{YELLOW}Downloading files...{NC}")
@@ -236,38 +268,6 @@ class ImageHandler:
         self.download_zip_file(destination_path)
         self.download_mission_jsons(destination_path)
         print(f"{YELLOW}Files downloaded to {image_path}{NC}")
-
-
-# LOOK AT DISABLING AUT0-UPLOAD
-
-# class RecordBag():
-#     def __init__(self, robot_name):
-#         self.robot_name = robot_name
-#         self.rosbags_list = [
-#             "/tf",
-#             "/tf_static",
-#             "/roboteq_diff_driver/left_motor_amps",
-#             "/roboteq_diff_driver/right_motor_amps"
-#         ]
-
-#         self.bag_path = f"/root/bags/{self.robot_name}-final_mission"
-
-#     def record_rosbag(self, robot_name):
-#         self.rosbags = (" ").join(self.rosbags_list)
-#         print(self.rosbags)
-#         proc = subprocess.run(
-#         [
-#             "ssh",
-#             "-t",
-#             f"root@{robot_name}.velociraptor-tuna.ts.net",
-#             "balena exec -it $(balena ps -q -f name=ros) bash -ic",
-#             f"'tmux new-session \'ros2 bag record {self.rosbags} -o {self.bag_path}\''",
-#         ],
-#         capture_output=True,
-#         text=True,
-#         )
-#         print(proc)
-#         return proc
 
 
 def parse_args():

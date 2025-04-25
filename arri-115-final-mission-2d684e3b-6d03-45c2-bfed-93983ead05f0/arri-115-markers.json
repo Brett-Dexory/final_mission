@@ -1,1 +1,143 @@
-{"kind":"MarkerDetectionList","metadata":{"length":7,"total":7,"offset":0},"items":[{"kind":"MarkerDetection","metadata":{"created_at":"2025-04-25T14:22:16Z","updated_at":"2025-04-25T14:22:16Z","uuid":"1600a5fa-12f5-4229-920e-ad4345ac1a90","labels":{}},"spec":{"message":"1Z78Y3370407022840","tag":"PALLET_ID","type":"Code128","transform":{"x":11.78,"y":28.81,"z":2.36}}},{"kind":"MarkerDetection","metadata":{"created_at":"2025-04-25T14:22:16Z","updated_at":"2025-04-25T14:22:16Z","uuid":"1902e546-4d6d-419e-a13f-5755c6702fac","labels":{}},"spec":{"message":"421826OX109T","tag":"PALLET_ID","type":"Code128","transform":{"x":12.05,"y":28.81,"z":2.27}}},{"kind":"MarkerDetection","metadata":{"created_at":"2025-04-25T14:22:16Z","updated_at":"2025-04-25T14:22:16Z","uuid":"4ed7c7ad-47c2-46e0-88b2-a21c73b3f103","labels":{}},"spec":{"message":"1Z78Y3370413086869","tag":"PALLET_ID","type":"Code128","transform":{"x":12.27,"y":28.81,"z":2.19}}},{"kind":"MarkerDetection","metadata":{"created_at":"2025-04-25T14:22:16Z","updated_at":"2025-04-25T14:22:16Z","uuid":"da626215-b8bf-4f11-9e64-504e6d03b9f4","labels":{}},"spec":{"message":"2LGBW105JJ+48000001","tag":"PALLET_ID","type":"Code128","transform":{"x":14.52,"y":28.81,"z":1.58}}},{"kind":"MarkerDetection","metadata":{"created_at":"2025-04-25T14:22:16Z","updated_at":"2025-04-25T14:22:16Z","uuid":"7c2ce0f4-5a70-4bac-9c6c-6da2e638efdf","labels":{}},"spec":{"message":"51777753","tag":"PALLET_ID","type":"Code128","transform":{"x":10.71,"y":28.81,"z":1.63}}},{"kind":"MarkerDetection","metadata":{"created_at":"2025-04-25T14:22:16Z","updated_at":"2025-04-25T14:22:16Z","uuid":"f68b54b4-a830-48e0-93a3-eab004a57690","labels":{}},"spec":{"message":"%OX109SJ15501344620886812826","tag":"PALLET_ID","type":"Code128","transform":{"x":13.51,"y":28.81,"z":1.5}}},{"kind":"MarkerDetection","metadata":{"created_at":"2025-04-25T14:22:16Z","updated_at":"2025-04-25T14:22:16Z","uuid":"a1d18b4e-1888-4cb8-976c-90ec3d4ef591","labels":{}},"spec":{"message":"JJD014600010935643381","tag":"PALLET_ID","type":"Code128","transform":{"x":14.28,"y":28.81,"z":5.85}}}]}
+{
+    "kind": "MarkerDetectionList",
+    "metadata": {
+        "length": 7,
+        "total": 7,
+        "offset": 0
+    },
+    "items": [
+        {
+            "kind": "MarkerDetection",
+            "metadata": {
+                "created_at": "2025-04-25T14:22:16Z",
+                "updated_at": "2025-04-25T14:22:16Z",
+                "uuid": "1600a5fa-12f5-4229-920e-ad4345ac1a90",
+                "labels": {}
+            },
+            "spec": {
+                "message": "1Z78Y3370407022840",
+                "tag": "PALLET_ID",
+                "type": "Code128",
+                "transform": {
+                    "x": 11.78,
+                    "y": 28.81,
+                    "z": 2.36
+                }
+            }
+        },
+        {
+            "kind": "MarkerDetection",
+            "metadata": {
+                "created_at": "2025-04-25T14:22:16Z",
+                "updated_at": "2025-04-25T14:22:16Z",
+                "uuid": "1902e546-4d6d-419e-a13f-5755c6702fac",
+                "labels": {}
+            },
+            "spec": {
+                "message": "421826OX109T",
+                "tag": "PALLET_ID",
+                "type": "Code128",
+                "transform": {
+                    "x": 12.05,
+                    "y": 28.81,
+                    "z": 2.27
+                }
+            }
+        },
+        {
+            "kind": "MarkerDetection",
+            "metadata": {
+                "created_at": "2025-04-25T14:22:16Z",
+                "updated_at": "2025-04-25T14:22:16Z",
+                "uuid": "4ed7c7ad-47c2-46e0-88b2-a21c73b3f103",
+                "labels": {}
+            },
+            "spec": {
+                "message": "1Z78Y3370413086869",
+                "tag": "PALLET_ID",
+                "type": "Code128",
+                "transform": {
+                    "x": 12.27,
+                    "y": 28.81,
+                    "z": 2.19
+                }
+            }
+        },
+        {
+            "kind": "MarkerDetection",
+            "metadata": {
+                "created_at": "2025-04-25T14:22:16Z",
+                "updated_at": "2025-04-25T14:22:16Z",
+                "uuid": "da626215-b8bf-4f11-9e64-504e6d03b9f4",
+                "labels": {}
+            },
+            "spec": {
+                "message": "2LGBW105JJ+48000001",
+                "tag": "PALLET_ID",
+                "type": "Code128",
+                "transform": {
+                    "x": 14.52,
+                    "y": 28.81,
+                    "z": 1.58
+                }
+            }
+        },
+        {
+            "kind": "MarkerDetection",
+            "metadata": {
+                "created_at": "2025-04-25T14:22:16Z",
+                "updated_at": "2025-04-25T14:22:16Z",
+                "uuid": "7c2ce0f4-5a70-4bac-9c6c-6da2e638efdf",
+                "labels": {}
+            },
+            "spec": {
+                "message": "51777753",
+                "tag": "PALLET_ID",
+                "type": "Code128",
+                "transform": {
+                    "x": 10.71,
+                    "y": 28.81,
+                    "z": 1.63
+                }
+            }
+        },
+        {
+            "kind": "MarkerDetection",
+            "metadata": {
+                "created_at": "2025-04-25T14:22:16Z",
+                "updated_at": "2025-04-25T14:22:16Z",
+                "uuid": "f68b54b4-a830-48e0-93a3-eab004a57690",
+                "labels": {}
+            },
+            "spec": {
+                "message": "%OX109SJ15501344620886812826",
+                "tag": "PALLET_ID",
+                "type": "Code128",
+                "transform": {
+                    "x": 13.51,
+                    "y": 28.81,
+                    "z": 1.5
+                }
+            }
+        },
+        {
+            "kind": "MarkerDetection",
+            "metadata": {
+                "created_at": "2025-04-25T14:22:16Z",
+                "updated_at": "2025-04-25T14:22:16Z",
+                "uuid": "a1d18b4e-1888-4cb8-976c-90ec3d4ef591",
+                "labels": {}
+            },
+            "spec": {
+                "message": "JJD014600010935643381",
+                "tag": "PALLET_ID",
+                "type": "Code128",
+                "transform": {
+                    "x": 14.28,
+                    "y": 28.81,
+                    "z": 5.85
+                }
+            }
+        }
+    ]
+}
