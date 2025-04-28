@@ -159,8 +159,8 @@ class ImageHandler:
     """Class to handle mission images"""
 
     def __init__(self):
-        self.robot_name = "arri-115"
-        self.deployment_id = "2d684e3b-6d03-45c2-bfed-93983ead05f0"
+        self.robot_name = "arri-125"
+        self.deployment_id = "a539dab3-11e0-4957-a8cf-0e9473f4e2a3"
 
         # self.robot_name = mission_handler.robot_name
 
@@ -197,34 +197,11 @@ class ImageHandler:
     def get_mission_pcd(self, destination_path):
         response = requests.get(self.point_cloud_endpoints)
         if response.status_code == 200:
-            pcd_image_path = destination_path / f"{self.robot_name}-deployment-pcd.txt"
-            with open(pcd_image_path, "wb") as f:
+            compressed_pcd_path = (
+                destination_path / f"{self.robot_name}-deployment-pcd.x-pcd"
+            )
+            with open(compressed_pcd_path, "wb") as f:
                 f.write(response.content)
-
-        return pcd_image_path
-        # return pcd_image_path
-
-    def convert_pcd_to_jpg(self, decompressed_path):
-        pcd_image_path = self.get_mission_pcd(decompressed_path)
-        data = np.load(pcd_image_path)
-
-        # coordinates
-        xs = data["x"]
-        ys = data["y"]
-        zs = data["z"]
-        # attribute
-        t_low = data["t_low"]
-
-        fig = plt.figure(figsize=(12, 7))
-        ax = fig.add_subplot(projection="3d")
-        img = ax.scatter(xs, ys, zs, c=t_low, cmap=plt.hot())
-        fig.colorbar(img)
-
-        ax.set_xlabel("X")
-        ax.set_ylabel("Y")
-        ax.set_zlabel("Z")
-
-        plt.show()
 
     def download_mission_jsons(self, destination_path):
         response = requests.get(self.locations_endpoint)
@@ -263,11 +240,14 @@ class ImageHandler:
         return image_path
 
     def download_file_decorator(self, destination_path, image_path):
+        print(f"{CYAN}======================={NC}")
         print(f"{YELLOW}Downloading files...{NC}")
-        self.download_deployment_image(destination_path)
-        self.download_zip_file(destination_path)
-        self.download_mission_jsons(destination_path)
-        print(f"{YELLOW}Files downloaded to {image_path}{NC}")
+        # self.download_deployment_image(destination_path)
+        # self.download_zip_file(destination_path)
+        # self.download_mission_jsons(destination_path)
+        self.get_mission_pcd(destination_path)
+        print(f"{CYAN}======================={NC}")
+        print(f"{YELLOW}Files downloaded to: \n{image_path}{NC}")
 
 
 def parse_args():
@@ -289,7 +269,7 @@ def main():
         ir = ImageHandler()
 
         destination_path = ir.get_image_folder()
-        image_path = destination_path / f"{ir.robot_name}-location-images.zip"
+        image_path = destination_path / f"{ir.robot_name}-final-mission"
 
         ir.download_file_decorator(destination_path, image_path)
 
